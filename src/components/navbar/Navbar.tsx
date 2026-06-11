@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import GoogleTranslateSwitcher from "@/components/language/GoogleTranslateSwitcher";
+import { useAppSelector } from "@/redux/hooks";
 
 const navLinks = [
   { label: "হোম", href: "/" },
@@ -18,6 +20,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { token, user } = useAppSelector((state) => state.auth);
+  const isLoggedIn = Boolean(token);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -25,11 +29,10 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close menu on outside click
   useEffect(() => {
     if (!menuOpen) return;
-    const handler = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
+    const handler = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
       if (!target.closest("#mobile-menu") && !target.closest("#hamburger")) {
         setMenuOpen(false);
       }
@@ -40,46 +43,37 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top announcement bar */}
-      <div className="bg-[#8B0000] text-white text-xs sm:text-sm text-center py-1.5 px-4 font-medium tracking-wide">
-        🩸 জরুরি রক্তের প্রয়োজন? এখনই অনুরোধ করুন —&nbsp;
-        <a href="/emergency" className="underline underline-offset-2 hover:text-red-200 transition-colors">
-          ইমার্জেন্সি রিকোয়েস্ট
-        </a>
+      <div className="bg-[#8B0000] px-4 py-1.5 text-center text-xs font-medium tracking-wide text-white sm:text-sm">
+        🩸 জরুরি রক্তের প্রয়োজন? এখনই অনুরোধ করুন —{" "}
+        <Link href="/emergency" className="underline underline-offset-2 transition-colors hover:text-red-200">
+          ইমার্জেন্সি রিকোয়েস্ট
+        </Link>
       </div>
 
-      {/* Main Navbar */}
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
           scrolled
-            ? "bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(139,0,0,0.15)]"
+            ? "bg-white/95 shadow-[0_4px_20px_rgba(139,0,0,0.15)] backdrop-blur-md"
             : "bg-white shadow-sm"
         }`}
       >
-        {/* Blood drop drip decoration */}
         <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#8B0000] via-[#CC0000] to-[#8B0000]" />
 
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-18">
-
-            {/* ── Logo ── */}
-            <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
-              {/* Animated blood drop SVG */}
-              <div className="relative w-9 h-9 flex-shrink-0">
+        <nav className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between gap-3 lg:h-[68px]">
+            <Link href="/" className="notranslate group flex flex-shrink-0 items-center gap-2.5">
+              <div className="relative h-9 w-9 flex-shrink-0">
                 <svg
                   viewBox="0 0 40 50"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-full h-full drop-shadow-md group-hover:scale-110 transition-transform duration-300"
+                  className="h-full w-full drop-shadow-md transition-transform duration-300 group-hover:scale-110"
                 >
-                  {/* Outer drop */}
                   <path
                     d="M20 2 C20 2 4 20 4 32 C4 41.5 11.2 48 20 48 C28.8 48 36 41.5 36 32 C36 20 20 2 20 2Z"
                     fill="url(#bloodGrad)"
                   />
-                  {/* Inner shine */}
                   <ellipse cx="14" cy="26" rx="4" ry="6" fill="rgba(255,255,255,0.25)" />
-                  {/* Pulse ring */}
                   <path
                     d="M20 2 C20 2 4 20 4 32 C4 41.5 11.2 48 20 48 C28.8 48 36 41.5 36 32 C36 20 20 2 20 2Z"
                     stroke="#FF4444"
@@ -98,57 +92,50 @@ export default function Navbar() {
               </div>
 
               <div className="flex flex-col leading-tight">
-                <span className="text-xl sm:text-2xl font-extrabold text-[#CC0000] tracking-tight group-hover:text-[#8B0000] transition-colors duration-200">
+                <span className="text-xl font-extrabold tracking-tight text-[#CC0000] transition-colors duration-200 group-hover:text-[#8B0000] sm:text-2xl">
                   আমার রক্ত
                 </span>
-                <span className="text-[10px] text-gray-500 font-medium tracking-widest uppercase hidden sm:block">
-                  Blood Donation Network
+                <span className="hidden text-[10px] font-medium uppercase tracking-widest text-gray-500 sm:block">
+                  রক্তদান নেটওয়ার্ক
                 </span>
               </div>
             </Link>
 
-            {/* ── Desktop Nav Links ── */}
-            <div className="hidden lg:flex items-center gap-1">
+            <div className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="relative px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-[#CC0000] transition-colors duration-200 group"
+                  className="group relative whitespace-nowrap rounded-md px-2 py-2 text-[13px] font-medium text-gray-700 transition-colors duration-200 hover:text-[#CC0000] xl:px-3 xl:text-sm"
                 >
                   {link.label}
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#CC0000] rounded-full group-hover:w-4/5 transition-all duration-300" />
+                  <span className="absolute bottom-0 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-[#CC0000] transition-all duration-300 group-hover:w-4/5" />
                 </Link>
               ))}
 
-              {/* Blood Group Quick Finder Dropdown */}
-              <div className="relative ml-2">
+              <div className="relative ml-1">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-[#CC0000] transition-colors duration-200"
+                  className="flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-2 text-[13px] font-medium text-gray-700 transition-colors duration-200 hover:text-[#CC0000] xl:px-3 xl:text-sm"
                   aria-expanded={dropdownOpen}
                   aria-haspopup="true"
                 >
                   <span>রক্তের গ্রুপ</span>
-                  <svg
-                    className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <ChevronIcon open={dropdownOpen} />
                 </button>
 
                 {dropdownOpen && (
                   <div
-                    className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-red-100 overflow-hidden z-50"
+                    className="absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-xl border border-red-100 bg-white shadow-xl"
                     onMouseLeave={() => setDropdownOpen(false)}
                   >
-                    <div className="p-2 grid grid-cols-4 gap-1">
+                    <div className="grid grid-cols-4 gap-1 p-2">
                       {bloodGroups.map((group) => (
                         <Link
                           key={group}
                           href={`/find-blood?group=${group}`}
                           onClick={() => setDropdownOpen(false)}
-                          className="flex items-center justify-center h-10 rounded-lg text-sm font-bold text-white bg-gradient-to-br from-[#CC0000] to-[#8B0000] hover:from-[#FF2222] hover:to-[#CC0000] transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                          className="flex h-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#CC0000] to-[#8B0000] text-sm font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:from-[#FF2222] hover:to-[#CC0000] hover:shadow-md"
                         >
                           {group}
                         </Link>
@@ -158,7 +145,7 @@ export default function Navbar() {
                       <Link
                         href="/find-blood"
                         onClick={() => setDropdownOpen(false)}
-                        className="block w-full text-center text-xs text-[#CC0000] font-medium hover:underline"
+                        className="block w-full text-center text-xs font-medium text-[#CC0000] hover:underline"
                       >
                         সব গ্রুপ দেখুন →
                       </Link>
@@ -168,32 +155,50 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* ── Desktop CTA Buttons ── */}
-            <div className="hidden lg:flex items-center gap-3">
-              <Link
-                href="/login"
-                className="px-4 py-2 text-sm font-semibold text-[#CC0000] border-2 border-[#CC0000] rounded-full hover:bg-[#CC0000] hover:text-white transition-all duration-200"
-              >
-                লগইন
-              </Link>
+            <div className="hidden flex-shrink-0 items-center gap-2 lg:flex">
+              <GoogleTranslateSwitcher />
+              {isLoggedIn ? (
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 whitespace-nowrap rounded-full border-2 border-[#CC0000] bg-red-50 px-3 py-2 text-sm font-bold text-[#CC0000] transition-all duration-200 hover:bg-[#CC0000] hover:text-white xl:px-4"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#CC0000] text-xs font-extrabold text-white">
+                    {user?.name?.charAt(0) || "প"}
+                  </span>
+                  <span>প্রোফাইল</span>
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="whitespace-nowrap rounded-full border-2 border-[#CC0000] px-3 py-2 text-sm font-semibold text-[#CC0000] transition-all duration-200 hover:bg-[#CC0000] hover:text-white xl:px-4"
+                  >
+                    লগইন
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md xl:px-4"
+                    style={{ background: "linear-gradient(135deg, #CC0000 0%, #8B0000 100%)" }}
+                  >
+                    রেজিস্ট্রেশন
+                  </Link>
+                </>
+              )}
               <Link
                 href="/donate"
-                className="relative px-5 py-2 text-sm font-bold text-white rounded-full overflow-hidden group"
+                className="group relative overflow-hidden whitespace-nowrap rounded-full px-4 py-2 text-sm font-bold text-white"
                 style={{ background: "linear-gradient(135deg, #CC0000 0%, #8B0000 100%)" }}
               >
-                <span className="relative z-10 flex items-center gap-1.5">
-                  🩸 রক্ত দিন
-                </span>
-                {/* Ripple hover effect */}
-                <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-full" />
+                <span className="relative z-10 flex items-center gap-1.5">🩸 রক্ত দিন</span>
+                <span className="absolute inset-0 rounded-full bg-white opacity-0 transition-opacity duration-200 group-hover:opacity-10" />
               </Link>
             </div>
 
-            {/* ── Mobile: CTA + Hamburger ── */}
-            <div className="flex lg:hidden items-center gap-2">
+            <div className="flex items-center gap-1.5 lg:hidden">
+              <GoogleTranslateSwitcher compact />
               <Link
                 href="/donate"
-                className="px-3 py-1.5 text-xs font-bold text-white rounded-full shadow-md"
+                className="rounded-full px-3 py-1.5 text-xs font-bold text-white shadow-md"
                 style={{ background: "linear-gradient(135deg, #CC0000 0%, #8B0000 100%)" }}
               >
                 🩸 দিন
@@ -202,56 +207,42 @@ export default function Navbar() {
               <button
                 id="hamburger"
                 onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Toggle menu"
+                aria-label="মেনু খুলুন বা বন্ধ করুন"
                 aria-expanded={menuOpen}
-                className="p-2 rounded-lg text-gray-700 hover:bg-red-50 hover:text-[#CC0000] transition-colors duration-200"
+                className="rounded-lg p-2 text-gray-700 transition-colors duration-200 hover:bg-red-50 hover:text-[#CC0000]"
               >
-                <div className="w-5 h-4 flex flex-col justify-between">
-                  <span
-                    className={`block h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${
-                      menuOpen ? "rotate-45 translate-y-[7px]" : ""
-                    }`}
-                  />
-                  <span
-                    className={`block h-0.5 bg-current rounded-full transition-all duration-300 ${
-                      menuOpen ? "opacity-0 scale-x-0" : ""
-                    }`}
-                  />
-                  <span
-                    className={`block h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${
-                      menuOpen ? "-rotate-45 -translate-y-[7px]" : ""
-                    }`}
-                  />
+                <div className="flex h-4 w-5 flex-col justify-between">
+                  <span className={`block h-0.5 origin-center rounded-full bg-current transition-all duration-300 ${menuOpen ? "translate-y-[7px] rotate-45" : ""}`} />
+                  <span className={`block h-0.5 rounded-full bg-current transition-all duration-300 ${menuOpen ? "scale-x-0 opacity-0" : ""}`} />
+                  <span className={`block h-0.5 origin-center rounded-full bg-current transition-all duration-300 ${menuOpen ? "-translate-y-[7px] -rotate-45" : ""}`} />
                 </div>
               </button>
             </div>
           </div>
         </nav>
 
-        {/* ── Mobile Menu ── */}
         <div
           id="mobile-menu"
-          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            menuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+          className={`overflow-hidden transition-all duration-300 ease-in-out lg:hidden ${
+            menuOpen ? "max-h-[650px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="bg-white border-t border-red-100 px-4 pt-3 pb-5 space-y-1">
+          <div className="space-y-1 border-t border-red-100 bg-white px-4 pb-5 pt-3">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-[#CC0000] transition-colors duration-200"
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-red-50 hover:text-[#CC0000]"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#CC0000] flex-shrink-0" />
+                <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#CC0000]" />
                 {link.label}
               </Link>
             ))}
 
-            {/* Blood group grid in mobile */}
-            <div className="pt-3 pb-1">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 mb-2">
-                রক্তের গ্রুপ অনুযায়ী খুঁজুন
+            <div className="pb-1 pt-3">
+              <p className="mb-2 px-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                রক্তের গ্রুপ অনুযায়ী খুঁজুন
               </p>
               <div className="grid grid-cols-4 gap-2 px-2">
                 {bloodGroups.map((group) => (
@@ -259,7 +250,7 @@ export default function Navbar() {
                     key={group}
                     href={`/find-blood?group=${group}`}
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center h-11 rounded-xl text-sm font-bold text-white shadow-sm active:scale-95 transition-transform"
+                    className="flex h-11 items-center justify-center rounded-xl text-sm font-bold text-white shadow-sm transition-transform active:scale-95"
                     style={{ background: "linear-gradient(135deg, #CC0000 0%, #8B0000 100%)" }}
                   >
                     {group}
@@ -268,27 +259,55 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Mobile auth buttons */}
-            <div className="flex gap-3 pt-3 px-2">
-              <Link
-                href="/login"
-                onClick={() => setMenuOpen(false)}
-                className="flex-1 text-center py-2.5 text-sm font-semibold text-[#CC0000] border-2 border-[#CC0000] rounded-full hover:bg-[#CC0000] hover:text-white transition-all duration-200"
-              >
-                লগইন
-              </Link>
-              <Link
-                href="/register"
-                onClick={() => setMenuOpen(false)}
-                className="flex-1 text-center py-2.5 text-sm font-bold text-white rounded-full"
-                style={{ background: "linear-gradient(135deg, #CC0000 0%, #8B0000 100%)" }}
-              >
-                রেজিস্ট্রেশন
-              </Link>
+            <div className="flex gap-3 px-2 pt-3">
+              {isLoggedIn ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-[#CC0000] bg-red-50 py-2.5 text-sm font-bold text-[#CC0000] hover:bg-[#CC0000] hover:text-white"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#CC0000] text-xs font-extrabold text-white">
+                    {user?.name?.charAt(0) || "প"}
+                  </span>
+                  প্রোফাইল
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex-1 rounded-full border-2 border-[#CC0000] py-2.5 text-center text-sm font-semibold text-[#CC0000] transition-all duration-200 hover:bg-[#CC0000] hover:text-white"
+                  >
+                    লগইন
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex-1 rounded-full py-2.5 text-center text-sm font-bold text-white"
+                    style={{ background: "linear-gradient(135deg, #CC0000 0%, #8B0000 100%)" }}
+                  >
+                    রেজিস্ট্রেশন
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
       </header>
     </>
+  );
+}
+
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
   );
 }

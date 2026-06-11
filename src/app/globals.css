@@ -111,6 +111,26 @@ body {
   box-shadow: 0 4px 15px rgba(204, 0, 0, 0.35);
 }
 
+/* Keep Google Translate functional without letting its default UI affect layout. */
+.goog-te-banner-frame,
+.goog-te-balloon-frame,
+#goog-gt-tt,
+.goog-te-gadget {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+.skiptranslate {
+  display: none !important;
+}
+
+.notranslate {
+  display: inline-flex !important;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #fff5f5; }
